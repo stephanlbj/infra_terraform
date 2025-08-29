@@ -10,8 +10,3 @@ variable "s3_bucket" {
   
 }
 
-variable "cloudfront_distribution_id" {
-  description = "ID de la distribution CloudFront pour staging"
-  default     = "XXXXXXXXXXXX"
-  type        = string
-}

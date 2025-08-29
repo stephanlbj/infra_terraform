@@ -8,7 +8,4 @@ variable "s3_bucket" {
   type        = string
 }
 
-variable "cloudfront_distribution_id" {
-  description = "ID de la distribution CloudFront pour production"
-  type        = string
-}
+ 
