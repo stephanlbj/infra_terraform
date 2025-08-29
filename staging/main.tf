@@ -6,10 +6,18 @@ provider "aws" {
 resource "aws_s3_bucket" "nextjs_staging" {
   bucket = var.s3_bucket
   acl    = "public-read"
+}
 
-  website {
-    index_document = "index.html"
-    error_document = "index.html"
+# Configuration site web pour S3 (remplace le deprecated "website")
+resource "aws_s3_bucket_website_configuration" "staging" {
+  bucket = aws_s3_bucket.nextjs_staging.id
+
+  index_document {
+    suffix = "index.html"
+  }
+
+  error_document {
+    key = "index.html"
   }
 }
 
@@ -46,6 +54,13 @@ resource "aws_cloudfront_distribution" "staging_cdn" {
     cached_methods         = ["GET", "HEAD"]
     target_origin_id       = "S3-nextjs-staging"
     viewer_protocol_policy = "redirect-to-https"
+  }
+
+  # Obligatoire depuis Terraform 6.x
+  restrictions {
+    geo_restriction {
+      restriction_type = "none"
+    }
   }
 
   viewer_certificate {
