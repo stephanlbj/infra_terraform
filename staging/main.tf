@@ -2,9 +2,12 @@ provider "aws" {
   region = var.aws_region
 }
 
-# Bucket S3
+# Récupérer l’account_id pour rendre le bucket unique
+data "aws_caller_identity" "current" {}
+
+# Bucket S3 (unique par compte AWS)
 resource "aws_s3_bucket" "nextjs_staging" {
-  bucket = var.s3_bucket
+  bucket = "${var.s3_bucket}-${data.aws_caller_identity.current.account_id}"
 }
 
 # Ownership (remplace l’ancien acl)
@@ -16,7 +19,7 @@ resource "aws_s3_bucket_ownership_controls" "staging" {
   }
 }
 
-# Configuration site web pour S3 (remplace le deprecated "website")
+# Configuration site web pour S3
 resource "aws_s3_bucket_website_configuration" "staging" {
   bucket = aws_s3_bucket.nextjs_staging.id
 
@@ -64,7 +67,6 @@ resource "aws_cloudfront_distribution" "staging_cdn" {
     viewer_protocol_policy = "redirect-to-https"
   }
 
-  # Obligatoire depuis Terraform 6.x
   restrictions {
     geo_restriction {
       restriction_type = "none"
