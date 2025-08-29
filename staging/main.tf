@@ -5,7 +5,15 @@ provider "aws" {
 # Bucket S3
 resource "aws_s3_bucket" "nextjs_staging" {
   bucket = var.s3_bucket
-  acl    = "public-read"
+}
+
+# Ownership (remplace l’ancien acl)
+resource "aws_s3_bucket_ownership_controls" "staging" {
+  bucket = aws_s3_bucket.nextjs_staging.id
+
+  rule {
+    object_ownership = "BucketOwnerEnforced"
+  }
 }
 
 # Configuration site web pour S3 (remplace le deprecated "website")
