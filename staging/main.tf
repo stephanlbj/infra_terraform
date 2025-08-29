@@ -52,3 +52,12 @@ resource "aws_cloudfront_distribution" "staging_cdn" {
     cloudfront_default_certificate = true
   }
 }
+
+# Outputs pour GitHub Actions
+output "cloudfront_distribution_id" {
+  value = aws_cloudfront_distribution.staging_cdn.id
+}
+
+output "cloudfront_domain_name" {
+  value = aws_cloudfront_distribution.staging_cdn.domain_name
+}
