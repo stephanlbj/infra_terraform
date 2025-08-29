@@ -5,9 +5,9 @@ provider "aws" {
 # Récupérer l’account_id pour rendre le bucket unique
 data "aws_caller_identity" "current" {}
 
-# Bucket S3 (unique par compte AWS + timestamp)
+# Bucket S3 (unique par compte AWS + timestamp safe)
 resource "aws_s3_bucket" "nextjs_staging" {
-  bucket = "${var.s3_bucket}-${data.aws_caller_identity.current.account_id}-${timestamp()}"
+  bucket = "${var.s3_bucket}-${data.aws_caller_identity.current.account_id}-${formatdate("YYYYMMDDHHMMSS", timestamp())}"
 }
 
 # Ownership
@@ -43,36 +43,11 @@ resource "aws_s3_bucket_website_configuration" "staging" {
 
 # Origin Access Control (OAC) pour CloudFront
 resource "aws_cloudfront_origin_access_control" "staging_oac" {
-  name                              = "staging-oac"
+  name                              = "staging-oac-${data.aws_caller_identity.current.account_id}"
   description                       = "OAC for staging bucket"
   origin_access_control_origin_type = "s3"
   signing_behavior                  = "always"
   signing_protocol                  = "sigv4"
-}
-
-# Policy pour autoriser CloudFront à lire depuis S3
-resource "aws_s3_bucket_policy" "staging_policy" {
-  bucket = aws_s3_bucket.nextjs_staging.id
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Sid       = "AllowCloudFrontAccess"
-        Effect    = "Allow"
-        Principal = {
-          Service = "cloudfront.amazonaws.com"
-        }
-        Action    = "s3:GetObject"
-        Resource  = "${aws_s3_bucket.nextjs_staging.arn}/*"
-        Condition = {
-          StringEquals = {
-            "AWS:SourceArn" = aws_cloudfront_distribution.staging_cdn.arn
-          }
-        }
-      }
-    ]
-  })
 }
 
 # Distribution CloudFront
