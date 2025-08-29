@@ -41,9 +41,9 @@ resource "aws_s3_bucket_website_configuration" "staging" {
   }
 }
 
-# Origin Access Control (OAC) pour CloudFront
+# Origin Access Control (OAC) pour CloudFront avec nom unique
 resource "aws_cloudfront_origin_access_control" "staging_oac" {
-  name                              = "staging-oac-${data.aws_caller_identity.current.account_id}"
+  name                              = "staging-oac-${data.aws_caller_identity.current.account_id}-${formatdate("YYYYMMDDHHmmss", timestamp())}"
   description                       = "OAC for staging bucket"
   origin_access_control_origin_type = "s3"
   signing_behavior                  = "always"
