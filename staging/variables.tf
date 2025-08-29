@@ -4,9 +4,7 @@ variable "aws_region" {
 }
 
 variable "s3_bucket" {
-  description = "Nom du bucket S3 pour staging"
+  description = "Nom de base du bucket S3 pour staging"
   default     = "mon-bucket-staging"
   type        = string
-  
 }
-

@@ -5,9 +5,9 @@ provider "aws" {
 # Récupérer l’account_id pour rendre le bucket unique
 data "aws_caller_identity" "current" {}
 
-# Bucket S3 (unique par compte AWS)
+# Bucket S3 (unique par compte AWS + timestamp)
 resource "aws_s3_bucket" "nextjs_staging" {
-  bucket = "${var.s3_bucket}-${data.aws_caller_identity.current.account_id}"
+  bucket = "${var.s3_bucket}-${data.aws_caller_identity.current.account_id}-${timestamp()}"
 }
 
 # Ownership
