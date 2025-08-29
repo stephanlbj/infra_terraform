@@ -2,6 +2,7 @@ provider "aws" {
   region = var.aws_region
 }
 
+# Bucket S3
 resource "aws_s3_bucket" "nextjs_prod" {
   bucket = var.s3_bucket
   acl    = "public-read"
@@ -12,6 +13,7 @@ resource "aws_s3_bucket" "nextjs_prod" {
   }
 }
 
+# Politique publique pour S3
 resource "aws_s3_bucket_policy" "public_policy" {
   bucket = aws_s3_bucket.nextjs_prod.id
 
@@ -29,6 +31,7 @@ resource "aws_s3_bucket_policy" "public_policy" {
   })
 }
 
+# Distribution CloudFront
 resource "aws_cloudfront_distribution" "prod_cdn" {
   origin {
     domain_name = aws_s3_bucket.nextjs_prod.bucket_regional_domain_name
@@ -48,13 +51,4 @@ resource "aws_cloudfront_distribution" "prod_cdn" {
   viewer_certificate {
     cloudfront_default_certificate = true
   }
-}
-
-# Outputs pour GitHub Actions
-output "cloudfront_distribution_id" {
-  value = aws_cloudfront_distribution.prod_cdn.id
-}
-
-output "cloudfront_domain_name" {
-  value = aws_cloudfront_distribution.prod_cdn.domain_name
 }
